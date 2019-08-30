@@ -6,13 +6,13 @@
 using namespace std;
 using namespace Dodecahedron;
 
-Bigint GeneratePrime() {
+Bigint GeneratePrime(int speed) {
 	uint64_t nLoop;
 	uint64_t nMod;
 
 	std::random_device rd;
 	std::mt19937 gen(rd());
-	std::uniform_int_distribution<uint64_t> rnd(200, 1000);
+	std::uniform_int_distribution<uint64_t> rnd(20 * speed, 100 * speed);
 
 
 
@@ -99,8 +99,13 @@ Bigint modInverse(Bigint a, Bigint m)
 
 
 void CreateKeys() {
-	Bigint p = GeneratePrime();
-	Bigint q = GeneratePrime();
+
+	printf("Enter the speed coef for p and q range (0 - 1000): ");
+	int speed;
+	std::cin >> speed;
+
+	Bigint p = GeneratePrime(speed);
+	Bigint q = GeneratePrime(speed);
 	if (p == q)
 		throw new std::exception("p is equal to q");
 
@@ -113,20 +118,18 @@ void CreateKeys() {
 
 	std::cout << "e: " << e << "\n";
 
-	Bigint d = modInverse(e, phiN);
+	Bigint d = modInverse2(e, phiN);
 
 	std::cout << "d: " << d << "\n";
 }
 
 void Encode() {
 	printf("Please enter public key (n): ");
-	int pIntKey;
-	std::cin >> pIntKey;
-	Bigint pKey = Bigint(pIntKey);
+	Bigint pKey;
+	std::cin >> pKey;
 	printf("Please enter public key (e): ");
-	int peIntKey;
-	std::cin >> peIntKey;
-	Bigint peKey = Bigint(peIntKey);
+	int peKey;
+	std::cin >> peKey;
 
 	printf("Please enter your message: ");
 	string message;
@@ -142,7 +145,7 @@ void Encode() {
 		if (AsciiChar > 0){
 			Bigint BigAscii = AsciiChar;
 			//std::cout << el << "\n";
-			Bigint EncodedLeter = BigAscii.pow(peIntKey) % pKey;
+			Bigint EncodedLeter = BigAscii.pow(peKey) % pKey;
 			std::cout << EncodedLeter << " ";
 		}
 		
@@ -153,9 +156,8 @@ void Encode() {
 
 void Decode() {
 	printf("Please enter private key (n): ");
-	int pIntKey;
-	std::cin >> pIntKey;
-	Bigint pKey = Bigint(pIntKey);
+	Bigint pKey;
+	std::cin >> pKey;
 	printf("Please enter private key (d): ");
 	int pdIntKey;
 	std::cin >> pdIntKey;
