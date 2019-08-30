@@ -4,15 +4,15 @@
 #include "RSACpp.h"
 
 using namespace std;
+using namespace Dodecahedron;
 
-
-BigInt GeneratePrime() {
+Bigint GeneratePrime() {
 	uint64_t nLoop;
 	uint64_t nMod;
 
 	std::random_device rd;
 	std::mt19937 gen(rd());
-	std::uniform_int_distribution<uint64_t> rnd(12, 18);
+	std::uniform_int_distribution<uint64_t> rnd(200, 1000);
 
 
 
@@ -25,31 +25,31 @@ BigInt GeneratePrime() {
 			}
 		}
 		if (nMod == nLoop) {
-			return BigInt(nLoop);
+			return Bigint(nLoop);
 		}
 	}
 }
 
-BigInt pgcd(BigInt a, BigInt b)
+Bigint pgcd(Bigint a, Bigint b)
 {
-	BigInt r = BigInt(0);
+	Bigint r = Bigint(0);
 
 	if (a < b)
 		std::swap(a, b);
 
-	if ((r = a % b) == BigInt(0))
+	if ((r = a % b) == Bigint(0))
 		return b;
 	else
 		return pgcd(b, r);
 }
 
-BigInt PhiN(BigInt p , BigInt q) {
-	return (p - BigInt(1)) * (q - BigInt(1));
+Bigint PhiN(Bigint p , Bigint q) {
+	return (p - Bigint(1)) * (q - Bigint(1));
 }
 
-BigInt GenE(BigInt Smallest,BigInt PhiN) {
-	for (BigInt e = Smallest; e <= PhiN; e++) {
-		if (pgcd(PhiN, e) == BigInt(1)) {
+Bigint GenE(Bigint Smallest,Bigint PhiN) {
+	for (Bigint e = Smallest; e <= PhiN; e++) {
+		if (pgcd(PhiN, e) == Bigint(1)) {
 			return e;
 		}
 	}
@@ -57,19 +57,19 @@ BigInt GenE(BigInt Smallest,BigInt PhiN) {
 }
 
 
-BigInt modInverse2(BigInt a, BigInt m)
+Bigint modInverse2(Bigint a, Bigint m)
 {
-	BigInt m0 = m;
-	BigInt y = BigInt(0), x = BigInt(1);
+	Bigint m0 = m;
+	Bigint y = Bigint(0), x = Bigint(1);
 
-	if (m == BigInt(1))
-		return BigInt(0);
+	if (m == Bigint(1))
+		return Bigint(0);
 
-	while (a > BigInt(1))
+	while (a > Bigint(1))
 	{
 		// q is quotient 
-		BigInt q = a / m;
-		BigInt t = m;
+		Bigint q = a / m;
+		Bigint t = m;
 
 		// m is remainder now, process same as 
 		// Euclid's algo 
@@ -82,38 +82,38 @@ BigInt modInverse2(BigInt a, BigInt m)
 	}
 
 	// Make x positive 
-	if (x < BigInt(0))
+	if (x < Bigint(0))
 		x += m0;
 
 	return x;
 }
 
-BigInt modInverse(BigInt a, BigInt m)
+Bigint modInverse(Bigint a, Bigint m)
 {
 	a = a % m;
-	for (BigInt x = BigInt(1); x < m; x++)
-		if ((a * x) % m == BigInt(1))
+	for (Bigint x = Bigint(1); x < m; x++)
+		if ((a * x) % m == Bigint(1))
 			return x;
 	throw new std::exception("cannot find inv mod");
 }
 
 
 void CreateKeys() {
-	BigInt p = GeneratePrime();
-	BigInt q = GeneratePrime();
+	Bigint p = GeneratePrime();
+	Bigint q = GeneratePrime();
 	if (p == q)
 		throw new std::exception("p is equal to q");
 
-	BigInt n = p * q;
-	BigInt phiN = PhiN(p, q);
+	Bigint n = p * q;
+	Bigint phiN = PhiN(p, q);
 
 	std::cout << "p: " << p << " q: " << q << " n: " << n << " Phi(n): " << phiN << "\n";
 
-	BigInt e = p < q ? GenE(p, phiN) : GenE(q, phiN);
+	Bigint e = p < q ? GenE(p, phiN) : GenE(q, phiN);
 
 	std::cout << "e: " << e << "\n";
 
-	BigInt d = modInverse(e, phiN);
+	Bigint d = modInverse(e, phiN);
 
 	std::cout << "d: " << d << "\n";
 }
@@ -122,11 +122,11 @@ void Encode() {
 	printf("Please enter public key (n): ");
 	int pIntKey;
 	std::cin >> pIntKey;
-	BigInt pKey = BigInt(pIntKey);
+	Bigint pKey = Bigint(pIntKey);
 	printf("Please enter public key (e): ");
 	int peIntKey;
 	std::cin >> peIntKey;
-	BigInt peKey = BigInt(peIntKey);
+	Bigint peKey = Bigint(peIntKey);
 
 	printf("Please enter your message: ");
 	string message;
@@ -139,10 +139,10 @@ void Encode() {
 
 		
 		int AsciiChar = (int)c;
-		if (AsciiChar > 0) {
-			BigInt el = pow(BigInt(AsciiChar), peKey);
+		if (AsciiChar > 0){
+			Bigint BigAscii = AsciiChar;
 			//std::cout << el << "\n";
-			BigInt EncodedLeter = el % pKey;
+			Bigint EncodedLeter = BigAscii.pow(peIntKey) % pKey;
 			std::cout << EncodedLeter << " ";
 		}
 		
@@ -155,7 +155,7 @@ void Decode() {
 	printf("Please enter private key (n): ");
 	int pIntKey;
 	std::cin >> pIntKey;
-	BigInt pKey = BigInt(pIntKey);
+	Bigint pKey = Bigint(pIntKey);
 	printf("Please enter private key (d): ");
 	int pdIntKey;
 	std::cin >> pdIntKey;
@@ -169,10 +169,10 @@ void Decode() {
 
 	std::cout << "- Beginning of the message -" << "\n";
 	for (string str : splitedMessage) {
-		//BigInt dl = pow(EncodedLettre, d);
+		//Bigint dl = pow(EncodedLettre, d);
 		if (std::stoi(str) > 0) {
-			BigInt dl = pow(BigInt(str), pdIntKey);
-			BigInt DecodedLetter = dl % pKey;
+			Bigint dl = pow(Bigint(str), pdIntKey);
+			Bigint DecodedLetter = dl % pKey;
 			//std::cout << "(" << DecodedLetter << ")";
 			std::stringstream ss;
 			ss << DecodedLetter;
@@ -210,17 +210,17 @@ int main()
 	} while (choice != 3);
 	
 
-	//BigInt Lettre = BigInt(4);
+	//Bigint Lettre = Bigint(4);
 
-	//BigInt el = pow(Lettre, e);
+	//Bigint el = pow(Lettre, e);
 	////std::cout << el << "\n";
-	//BigInt EncodedLettre = el % n;
+	//Bigint EncodedLettre = el % n;
 
 	//std::cout << EncodedLettre << "\n";
 
-	//BigInt dl = pow(EncodedLettre, d);
+	//Bigint dl = pow(EncodedLettre, d);
 	////std::cout << dl << "\n";
-	//BigInt DecodedLetter = dl % n;
+	//Bigint DecodedLetter = dl % n;
 
 	//
 

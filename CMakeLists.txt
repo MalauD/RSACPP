@@ -4,6 +4,6 @@
 cmake_minimum_required (VERSION 3.8)
 
 # Ajoutez une source à l'exécutable de ce projet.
-add_executable (RSACpp "BigInt.cpp" "BigInt.h" "RSACpp.cpp" "RSACpp.h")
+add_executable (RSACpp "fft.tcc" "fft.h" "BigInt.cpp" "BigInt.h" "RSACpp.cpp" "RSACpp.h")
 
 # TODO: Ajoutez des tests et installez des cibles si nécessaire.
