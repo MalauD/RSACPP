@@ -84,6 +84,7 @@ namespace Dodecahedron
 
 		//Trivia
 		int digits() const;
+		uint64_t mod(uint64_t a);
 		int trailing_zeros() const;
 		int to_builtin() const { return number.empty() ? 0 : number.front(); }
 	private:

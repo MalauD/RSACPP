@@ -1,0 +1,151 @@
+#include "Rsa.h"
+
+Rsa::Rsa::Rsa()
+{
+
+}
+
+std::string Rsa::Rsa::Encode(std::string msg, RsaKey* key)
+{
+	std::ostringstream oss;
+
+	for (char c : msg) {
+		int AsciiChar = (int)c;
+		if (AsciiChar > 0) {
+			Bigint BigAscii = AsciiChar;
+			Bigint EncodedLeter = BigAscii.pow(key->e.to_builtin()) % key->n;
+			oss << EncodedLeter << " ";
+		}
+	}
+	 
+
+	return oss.str();
+}
+
+std::string Rsa::Rsa::Decode(std::string message, RsaKey* key)
+{
+	std::ostringstream oss;
+
+	std::istringstream iss(message);
+	std::vector<std::string> splitedMessage((std::istream_iterator<std::string>(iss)),
+		std::istream_iterator<std::string>());
+
+	for (std::string str : splitedMessage) {
+		//Bigint dl = pow(EncodedLettre, d);
+		if (std::stoi(str) > 0) {
+			Bigint dl = pow(Bigint(str), key->d.to_builtin());
+			Bigint DecodedLetter = Bigint(dl.mod(key->n.to_builtin()));
+			//std::cout << "(" << DecodedLetter << ")";
+			oss << static_cast<char>(DecodedLetter.to_builtin());
+		}
+
+	}
+
+	return oss.str();
+}
+
+Rsa::RsaKey* Rsa::Rsa::CreateKeys()
+{
+	Bigint p = BigIntHelper::RandomPrimer();
+	Bigint q = BigIntHelper::RandomPrimer();
+	if (p == q)
+		throw new std::exception("p is equal to q");
+
+	Bigint n = p * q;
+	Bigint phiN = BigIntHelper::PhiN(p, q);
+
+	Bigint e = p < q ? BigIntHelper::GenE(p, phiN) : BigIntHelper::GenE(q, phiN);
+
+	Bigint d = BigIntHelper::InvModulo(e, phiN);
+
+	return new RsaKey(n, d, e);
+}
+
+Bigint Rsa::BigIntHelper::Pgcd(Bigint a, Bigint b)
+{
+	Bigint r = Bigint(0);
+
+	if (a < b)
+		std::swap(a, b);
+
+	if ((r = a % b) == Bigint(0))
+		return b;
+	else
+		return Pgcd(b, r);
+}
+
+Bigint Rsa::BigIntHelper::PhiN(Bigint p, Bigint q)
+{
+	return (p - Bigint(1)) * (q - Bigint(1));
+}
+
+Bigint Rsa::BigIntHelper::GenE(Bigint Smallest, Bigint PhiN)
+{
+	for (Bigint e = Smallest; e <= PhiN; e++) {
+		if (Pgcd(PhiN, e) == Bigint(1)) {
+			return e;
+		}
+	}
+	throw new std::exception("cannot find E");
+}
+
+Bigint Rsa::BigIntHelper::InvModulo(Bigint a , Bigint m)
+{
+	Bigint m0 = m;
+	Bigint y = Bigint(0), x = Bigint(1);
+
+	if (m == Bigint(1))
+		return Bigint(0);
+
+	while (a > Bigint(1))
+	{
+		Bigint q = a / m;
+		Bigint t = m;
+
+		m = a % m, a = t;
+		t = y;
+
+		y = x - q * y;
+		x = t;
+	}
+
+	if (x < Bigint(0))
+		x += m0;
+
+	return x;
+}
+
+Bigint Rsa::BigIntHelper::RandomPrimer()
+{
+	uint64_t nLoop;
+	uint64_t nMod;
+
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_int_distribution<uint64_t> rnd(20, 100);
+
+
+	for (nLoop = rnd(gen); nLoop < 1844674407370955161 - 2; nLoop++) {
+		//for (nLoop = 3; nLoop < (100); nLoop++) {
+		for (nMod = 2; nMod < nLoop; nMod++) {
+			if ((nLoop % nMod) == 0) {
+				break;
+			}
+		}
+		if (nMod == nLoop) {
+			return Bigint(nLoop);
+		}
+	}
+}
+
+Rsa::RsaKey::RsaKey(Bigint nn, Bigint dd, Bigint ee)
+{
+	n = nn;
+	d = dd;
+	e = ee;
+}
+
+void Rsa::RsaKey::print()
+{
+	std::cout << "n: " << n << " d: " << d << " e: " << e << "\n";
+}

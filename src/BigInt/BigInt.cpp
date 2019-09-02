@@ -1,4 +1,5 @@
-﻿#include <string>
+﻿#include "BigInt.h"
+#include <string>
 #include <sstream>
 #include <map>
 #include <algorithm>
@@ -524,6 +525,19 @@ namespace Dodecahedron
 		digits += segment_length(number.back());
 
 		return digits;
+	}
+
+	uint64_t Bigint::mod(uint64_t a)
+	{
+		
+		// Initialize result 
+		uint64_t res = 0;
+		std::string num = to_string(*this);
+		// One by one process all digits of 'num' 
+		for (uint64_t i = 0; i < num.length(); i++)
+			res = (res * 10 + (uint64_t)num[i] - '0') % a;
+
+		return res;
 	}
 
 	int Bigint::trailing_zeros() const
