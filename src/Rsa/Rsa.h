@@ -26,7 +26,7 @@ namespace Rsa {
 			Rsa();
 			std::string Encode(std::string, RsaKey*);
 			std::string Decode(std::string, RsaKey*);
-			RsaKey* CreateKeys();
+			RsaKey* CreateKeys(int speed);
 			
 	};
 
@@ -35,7 +35,8 @@ namespace Rsa {
 		static Bigint PhiN(Bigint, Bigint);
 		static Bigint GenE(Bigint, Bigint);
 		static Bigint InvModulo(Bigint, Bigint);
-		static Bigint RandomPrimer();
+		static Bigint RandomPrimer(int);
+		static Bigint PowModN(uint64_t a, uint64_t b, uint64_t n);
 	};
 }
 

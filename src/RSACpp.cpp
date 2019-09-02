@@ -65,7 +65,11 @@ int main()
 		switch (choice)
 		{
 		case 0:
-			MyRsaClass->CreateKeys()->print();
+			printf("Enter speed for the creation of the keys :");
+			int s;
+			std::cin >> s;
+			printf("\n");
+			MyRsaClass->CreateKeys(s)->print();
 			break;
 		case 1:
 			Encode(MyRsaClass);

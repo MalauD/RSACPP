@@ -13,7 +13,7 @@ std::string Rsa::Rsa::Encode(std::string msg, RsaKey* key)
 		int AsciiChar = (int)c;
 		if (AsciiChar > 0) {
 			Bigint BigAscii = AsciiChar;
-			Bigint EncodedLeter = BigAscii.pow(key->e.to_builtin()) % key->n;
+			Bigint EncodedLeter = BigIntHelper::PowModN(BigAscii.to_builtin(),key->e.to_builtin(),key->n.to_builtin());
 			oss << EncodedLeter << " ";
 		}
 	}
@@ -33,8 +33,7 @@ std::string Rsa::Rsa::Decode(std::string message, RsaKey* key)
 	for (std::string str : splitedMessage) {
 		//Bigint dl = pow(EncodedLettre, d);
 		if (std::stoi(str) > 0) {
-			Bigint dl = pow(Bigint(str), key->d.to_builtin());
-			Bigint DecodedLetter = Bigint(dl.mod(key->n.to_builtin()));
+			Bigint DecodedLetter = BigIntHelper::PowModN(Bigint(str).to_builtin(),key->d.to_builtin(),key->n.to_builtin());
 			//std::cout << "(" << DecodedLetter << ")";
 			oss << static_cast<char>(DecodedLetter.to_builtin());
 		}
@@ -44,10 +43,10 @@ std::string Rsa::Rsa::Decode(std::string message, RsaKey* key)
 	return oss.str();
 }
 
-Rsa::RsaKey* Rsa::Rsa::CreateKeys()
+Rsa::RsaKey* Rsa::Rsa::CreateKeys(int speed)
 {
-	Bigint p = BigIntHelper::RandomPrimer();
-	Bigint q = BigIntHelper::RandomPrimer();
+	Bigint p = BigIntHelper::RandomPrimer(speed);
+	Bigint q = BigIntHelper::RandomPrimer(speed);
 	if (p == q)
 		throw new std::exception("p is equal to q");
 
@@ -115,14 +114,14 @@ Bigint Rsa::BigIntHelper::InvModulo(Bigint a , Bigint m)
 	return x;
 }
 
-Bigint Rsa::BigIntHelper::RandomPrimer()
+Bigint Rsa::BigIntHelper::RandomPrimer(int speed)
 {
 	uint64_t nLoop;
 	uint64_t nMod;
 
 	std::random_device rd;
 	std::mt19937 gen(rd());
-	std::uniform_int_distribution<uint64_t> rnd(20, 100);
+	std::uniform_int_distribution<uint64_t> rnd(200 * speed, 1000 * speed);
 
 
 	for (nLoop = rnd(gen); nLoop < 1844674407370955161 - 2; nLoop++) {
@@ -138,12 +137,23 @@ Bigint Rsa::BigIntHelper::RandomPrimer()
 	}
 }
 
+Bigint Rsa::BigIntHelper::PowModN(uint64_t a, uint64_t b, uint64_t n) {
+	a = a % n;
+	uint64_t c = 1;
+	for (uint64_t i = 1; i <= b; i++)
+		c = (c * a % n);
+
+	return Bigint(c);
+}
+
 Rsa::RsaKey::RsaKey(Bigint nn, Bigint dd, Bigint ee)
 {
 	n = nn;
 	d = dd;
 	e = ee;
 }
+
+
 
 void Rsa::RsaKey::print()
 {
