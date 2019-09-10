@@ -12,7 +12,7 @@ void Encode(Rsa::Rsa* RsaClass) {
 	Bigint pKey;
 	std::cin >> pKey;
 	printf("Please enter public key (e): ");
-	int peKey;
+	uint64_t peKey;
 	std::cin >> peKey;
 
 	Rsa::RsaKey* rsaKeys = new Rsa::RsaKey(pKey, 0, Bigint(peKey));
@@ -34,7 +34,7 @@ void Decode(Rsa::Rsa* RsaClass) {
 	uint64_t pKey;
 	std::cin >> pKey;
 	printf("Please enter private key (d): ");
-	int pdIntKey;
+	uint64_t pdIntKey;
 	std::cin >> pdIntKey;
 
 	Rsa::RsaKey* rsaKeys = new Rsa::RsaKey(pKey, Bigint(pdIntKey), 0);

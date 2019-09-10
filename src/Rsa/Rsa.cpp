@@ -121,7 +121,7 @@ Bigint Rsa::BigIntHelper::RandomPrimer(int speed)
 
 	std::random_device rd;
 	std::mt19937 gen(rd());
-	std::uniform_int_distribution<uint64_t> rnd(200 * speed, 1000 * speed);
+	std::uniform_int_distribution<uint64_t> rnd(20 * speed, 100 * speed);
 
 
 	for (nLoop = rnd(gen); nLoop < 1844674407370955161 - 2; nLoop++) {
@@ -139,11 +139,15 @@ Bigint Rsa::BigIntHelper::RandomPrimer(int speed)
 
 Bigint Rsa::BigIntHelper::PowModN(uint64_t a, uint64_t b, uint64_t n) {
 	a = a % n;
-	uint64_t c = 1;
-	for (uint64_t i = 1; i <= b; i++)
+	Bigint c = 1;
+	for (uint64_t i = 1; i <= b; i++) {
 		c = (c * a % n);
+		if (i % (b / 10) == 0) 
+			std::cout << b / i * 100 << "%\r";		
+	}
+		
 
-	return Bigint(c);
+	return c;
 }
 
 Rsa::RsaKey::RsaKey(Bigint nn, Bigint dd, Bigint ee)
