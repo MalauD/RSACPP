@@ -4,18 +4,18 @@
 #include "RSACpp.h"
 
 using namespace std;
-using namespace Dodecahedron;
+//using namespace Dodecahedron;
 
 
 void Encode(Rsa::Rsa* RsaClass) {
 	printf("Please enter public key (n): ");
-	Bigint pKey;
+	int64_t pKey;
 	std::cin >> pKey;
 	printf("Please enter public key (e): ");
-	uint64_t peKey;
+	int64_t peKey;
 	std::cin >> peKey;
 
-	Rsa::RsaKey* rsaKeys = new Rsa::RsaKey(pKey, 0, Bigint(peKey));
+	Rsa::RsaKey* rsaKeys = new Rsa::RsaKey(pKey, 0, int64_t(peKey));
 
 	printf("Please enter your message: ");
 	string message;
@@ -31,13 +31,12 @@ void Encode(Rsa::Rsa* RsaClass) {
 
 void Decode(Rsa::Rsa* RsaClass) {
 	printf("Please enter private key (n): ");
-	uint64_t pKey;
+	int64_t pKey;
 	std::cin >> pKey;
 	printf("Please enter private key (d): ");
-	uint64_t pdIntKey;
+	int64_t pdIntKey;
 	std::cin >> pdIntKey;
-
-	Rsa::RsaKey* rsaKeys = new Rsa::RsaKey(pKey, Bigint(pdIntKey), 0);
+	Rsa::RsaKey* rsaKeys = new Rsa::RsaKey(pKey, int64_t(pdIntKey), 0);
 
 	printf("Please enter the encrypted message: ");
 	string message;

@@ -12,8 +12,8 @@ std::string Rsa::Rsa::Encode(std::string msg, RsaKey* key)
 	for (char c : msg) {
 		int AsciiChar = (int)c;
 		if (AsciiChar > 0) {
-			Bigint BigAscii = AsciiChar;
-			Bigint EncodedLeter = BigIntHelper::PowModN(BigAscii.to_builtin(),key->e.to_builtin(),key->n.to_builtin());
+			int64_t BigAscii = AsciiChar;
+			int64_t EncodedLeter = int64_tHelper::PowModN(BigAscii.to_builtin(),key->e.to_builtin(),key->n.to_builtin());
 			oss << EncodedLeter << " ";
 		}
 	}
@@ -31,9 +31,9 @@ std::string Rsa::Rsa::Decode(std::string message, RsaKey* key)
 		std::istream_iterator<std::string>());
 
 	for (std::string str : splitedMessage) {
-		//Bigint dl = pow(EncodedLettre, d);
+		//int64_t dl = pow(EncodedLettre, d);
 		if (std::stoi(str) > 0) {
-			Bigint DecodedLetter = BigIntHelper::PowModN(Bigint(str).to_builtin(),key->d.to_builtin(),key->n.to_builtin());
+			int64_t DecodedLetter = int64_tHelper::PowModN(int64_t(str).to_builtin(),key->d.to_builtin(),key->n.to_builtin());
 			//std::cout << "(" << DecodedLetter << ")";
 			oss << static_cast<char>(DecodedLetter.to_builtin());
 		}
@@ -45,61 +45,61 @@ std::string Rsa::Rsa::Decode(std::string message, RsaKey* key)
 
 Rsa::RsaKey* Rsa::Rsa::CreateKeys(int speed)
 {
-	Bigint p = BigIntHelper::RandomPrimer(speed);
-	Bigint q = BigIntHelper::RandomPrimer(speed);
+	int64_t p = int64_tHelper::RandomPrimer(speed);
+	int64_t q = int64_tHelper::RandomPrimer(speed);
 	if (p == q)
 		throw new std::exception("p is equal to q");
 
-	Bigint n = p * q;
-	Bigint phiN = BigIntHelper::PhiN(p, q);
+	int64_t n = p * q;
+	int64_t phiN = int64_tHelper::PhiN(p, q);
 
-	Bigint e = p < q ? BigIntHelper::GenE(p, phiN) : BigIntHelper::GenE(q, phiN);
+	int64_t e = p < q ? int64_tHelper::GenE(p, phiN) : int64_tHelper::GenE(q, phiN);
 
-	Bigint d = BigIntHelper::InvModulo(e, phiN);
+	int64_t d = int64_tHelper::InvModulo(e, phiN);
 
 	return new RsaKey(n, d, e);
 }
 
-Bigint Rsa::BigIntHelper::Pgcd(Bigint a, Bigint b)
+int64_t Rsa::int64_tHelper::Pgcd(int64_t a, int64_t b)
 {
-	Bigint r = Bigint(0);
+	int64_t r = int64_t(0);
 
 	if (a < b)
 		std::swap(a, b);
 
-	if ((r = a % b) == Bigint(0))
+	if ((r = a % b) == int64_t(0))
 		return b;
 	else
 		return Pgcd(b, r);
 }
 
-Bigint Rsa::BigIntHelper::PhiN(Bigint p, Bigint q)
+int64_t Rsa::int64_tHelper::PhiN(int64_t p, int64_t q)
 {
-	return (p - Bigint(1)) * (q - Bigint(1));
+	return (p - int64_t(1)) * (q - int64_t(1));
 }
 
-Bigint Rsa::BigIntHelper::GenE(Bigint Smallest, Bigint PhiN)
+int64_t Rsa::int64_tHelper::GenE(int64_t Smallest, int64_t PhiN)
 {
-	for (Bigint e = Smallest; e <= PhiN; e++) {
-		if (Pgcd(PhiN, e) == Bigint(1)) {
+	for (int64_t e = Smallest; e <= PhiN; e++) {
+		if (Pgcd(PhiN, e) == int64_t(1)) {
 			return e;
 		}
 	}
 	throw new std::exception("cannot find E");
 }
 
-Bigint Rsa::BigIntHelper::InvModulo(Bigint a , Bigint m)
+int64_t Rsa::int64_tHelper::InvModulo(int64_t a , int64_t m)
 {
-	Bigint m0 = m;
-	Bigint y = Bigint(0), x = Bigint(1);
+	int64_t m0 = m;
+	int64_t y = int64_t(0), x = int64_t(1);
 
-	if (m == Bigint(1))
-		return Bigint(0);
+	if (m == int64_t(1))
+		return int64_t(0);
 
-	while (a > Bigint(1))
+	while (a > int64_t(1))
 	{
-		Bigint q = a / m;
-		Bigint t = m;
+		int64_t q = a / m;
+		int64_t t = m;
 
 		m = a % m, a = t;
 		t = y;
@@ -108,20 +108,20 @@ Bigint Rsa::BigIntHelper::InvModulo(Bigint a , Bigint m)
 		x = t;
 	}
 
-	if (x < Bigint(0))
+	if (x < int64_t(0))
 		x += m0;
 
 	return x;
 }
 
-Bigint Rsa::BigIntHelper::RandomPrimer(int speed)
+int64_t Rsa::int64_tHelper::RandomPrimer(int speed)
 {
-	uint64_t nLoop;
-	uint64_t nMod;
+	int64_t nLoop;
+	int64_t nMod;
 
 	std::random_device rd;
 	std::mt19937 gen(rd());
-	std::uniform_int_distribution<uint64_t> rnd(20 * speed, 100 * speed);
+	std::uniform_int_distribution<int64_t> rnd(20 * speed, 100 * speed);
 
 
 	for (nLoop = rnd(gen); nLoop < 1844674407370955161 - 2; nLoop++) {
@@ -132,15 +132,15 @@ Bigint Rsa::BigIntHelper::RandomPrimer(int speed)
 			}
 		}
 		if (nMod == nLoop) {
-			return Bigint(nLoop);
+			return int64_t(nLoop);
 		}
 	}
 }
 
-Bigint Rsa::BigIntHelper::PowModN(uint64_t a, uint64_t b, uint64_t n) {
+int64_t Rsa::int64_tHelper::PowModN(int64_t a, int64_t b, int64_t n) {
 	a = a % n;
-	Bigint c = 1;
-	for (uint64_t i = 1; i <= b; i++) {
+	int64_t c = 1;
+	for (int64_t i = 1; i <= b; i++) {
 		c = (c * a % n);
 		if (i % (b / 10) == 0) 
 			std::cout << b / i * 100 << "%\r";		
@@ -150,7 +150,7 @@ Bigint Rsa::BigIntHelper::PowModN(uint64_t a, uint64_t b, uint64_t n) {
 	return c;
 }
 
-Rsa::RsaKey::RsaKey(Bigint nn, Bigint dd, Bigint ee)
+Rsa::RsaKey::RsaKey(int64_t nn, int64_t dd, int64_t ee)
 {
 	n = nn;
 	d = dd;

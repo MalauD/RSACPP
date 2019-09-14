@@ -1,5 +1,5 @@
 #include <iostream>
-#include "./../BigInt/BigInt.h"
+#include "./../int64_t/int64_t.h"
 #include <string>
 #include <random>
 #include <tuple>
@@ -14,10 +14,10 @@ using namespace Dodecahedron;
 namespace Rsa {
 	struct RsaKey
 	{
-		Bigint n;
-		Bigint d;
-		Bigint e;
-		RsaKey(Bigint, Bigint, Bigint);
+		int64_t n;
+		int64_t d;
+		int64_t e;
+		RsaKey(int64_t, int64_t, int64_t);
 		void print();
 	};
 
@@ -30,13 +30,13 @@ namespace Rsa {
 			
 	};
 
-	struct BigIntHelper {
-		static Bigint Pgcd(Bigint,Bigint);
-		static Bigint PhiN(Bigint, Bigint);
-		static Bigint GenE(Bigint, Bigint);
-		static Bigint InvModulo(Bigint, Bigint);
-		static Bigint RandomPrimer(int);
-		static Bigint PowModN(uint64_t a, uint64_t b, uint64_t n);
+	struct int64_tHelper {
+		static int64_t Pgcd(int64_t,int64_t);
+		static int64_t PhiN(int64_t, int64_t);
+		static int64_t GenE(int64_t, int64_t);
+		static int64_t InvModulo(int64_t, int64_t);
+		static int64_t RandomPrimer(int);
+		static int64_t PowModN(int64_t a, int64_t b, int64_t n);
 	};
 }
 
